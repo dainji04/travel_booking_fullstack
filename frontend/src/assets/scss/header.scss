@@ -1,0 +1,59 @@
+@use 'variables';
+.navbar {
+    background: variables.$secondary-color;
+    display: flex;
+    padding: 20px 0;
+}
+
+.list {
+    list-style-type: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    gap: 72px;
+
+    &__text {
+        font-family: variables.$font-primary;
+        font-size: 25px;
+        font-weight: 700;
+        color: #000;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover {
+            color: variables.$primary-rgb-gradient-color;
+        }
+    }
+}
+
+.options {
+    margin-right: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    &__icon {
+        cursor: pointer;
+    }
+}
+
+.logo {
+    height: 300px;
+
+    &__box {
+        width: 256px;
+        height: 188px;
+        border-radius: 0px 0px 999px 999px;
+        border: 0px solid #000;
+        background: linear-gradient(180deg, #d06814 0%, #ffcdb2 96.56%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: 90px;
+    }
+
+    &__image {
+        margin-bottom: 40px;
+    }
+}
