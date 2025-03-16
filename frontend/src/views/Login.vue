@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, email, minLength } from '@vuelidate/validators';
 import AuthLayout from '@/layouts/AuthLayout.vue';
+import axios from 'axios';
 
 const isHide = ref(false);
 const formData = ref({
@@ -27,6 +28,20 @@ const v$ = useVuelidate(rules, formData);
 const submit = async () => {
     const isValid = await v$.value.$validate();
     if (isValid) {
+        const body = {
+            email: formData.value.email,
+            password: formData.value.password,
+            remember: formData.value.remember,
+        };
+
+        axios
+            .post('/login', body)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
         console.log('Form hợp lệ!', formData.value);
     }
 };
@@ -35,10 +50,11 @@ const submit = async () => {
 <template>
     <AuthLayout>
         <div>
-            <h1 class="login__heading">Login</h1>
+            <h1 class="login__heading">gg</h1>
         </div>
         <div class="login__form">
-            <form action="">
+            <form action="/auth/login/store" met hod="post">
+                @csrf
                 <div class="login__input-group">
                     <div class="login__form-group">
                         <input
@@ -87,7 +103,7 @@ const submit = async () => {
                 <button
                     class="login__submit login__form-group"
                     type="submit"
-                    @click.prevent="submit()"
+                    @click.prevent="submit"
                 >
                     <span>login</span>
                 </button>
