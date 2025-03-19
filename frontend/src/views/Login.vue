@@ -1,50 +1,53 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
-import useVuelidate from '@vuelidate/core';
-import { required, email, minLength } from '@vuelidate/validators';
+import { ref, watch } from 'vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
-import axios from 'axios';
+import { useAuthStore } from '@/stores/auth';
 
-const isHide = ref(false);
 const formData = ref({
     email: '',
     password: '',
     remember: false,
 });
 
-const rules = {
-    email: {
-        required,
-        email,
-    },
-    password: {
-        required,
-        minLength: minLength(6),
-    },
-};
+const errorsLogin = ref({
+    email: [] as string[],
+    password: [] as string[],
+});
 
-const v$ = useVuelidate(rules, formData);
+const watchForm = () => {
+    watch(
+        () => formData.value.email,
+        () => {
+            errorsLogin.value.email = [];
+        }
+    );
+
+    watch(
+        () => formData.value.password,
+        () => {
+            errorsLogin.value.password = [];
+        }
+    );
+};
 
 const submit = async () => {
-    const isValid = await v$.value.$validate();
-    if (isValid) {
-        const body = {
-            email: formData.value.email,
-            password: formData.value.password,
-            remember: formData.value.remember,
-        };
+    const { errors, login } = useAuthStore();
+    const body = {
+        email: formData.value.email,
+        password: formData.value.password,
+        remember: formData.value.remember,
+    };
 
-        axios
-            .post('/login', body)
-            .then((response) => {
-                console.log(response);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-        console.log('Form hợp lệ!', formData.value);
-    }
+    await login(body);
+    errorsLogin.value.email = await errors.email;
+    errorsLogin.value.password = await errors.password;
 };
+
+const app = () => {
+    watchForm();
+};
+
+app();
 </script>
 
 <template>
@@ -53,8 +56,7 @@ const submit = async () => {
             <h1 class="login__heading">gg</h1>
         </div>
         <div class="login__form">
-            <form action="/auth/login/store" met hod="post">
-                @csrf
+            <form>
                 <div class="login__input-group">
                     <div class="login__form-group">
                         <input
@@ -63,13 +65,8 @@ const submit = async () => {
                             type="text"
                             placeholder="Email or phone number"
                         />
-                        <div v-if="v$.email.$error">
-                            <p class="error" v-if="v$.email.required.$invalid">
-                                Email là bắt buộc!
-                            </p>
-                            <p class="error" v-if="v$.email.email.$invalid">
-                                Email không hợp lệ
-                            </p>
+                        <div v-if="errorsLogin.email[0]">
+                            <p class="error">{{ errorsLogin.email[0] }}</p>
                         </div>
                     </div>
                     <div class="login__form-group">
@@ -84,19 +81,8 @@ const submit = async () => {
                             src="@/assets/fonts/eyeHide.svg"
                             alt=""
                         />
-                        <div v-if="v$.password.$error">
-                            <p
-                                class="error"
-                                v-if="v$.password.required.$invalid"
-                            >
-                                Mật khẩu là bắt buộc!
-                            </p>
-                            <p
-                                class="error"
-                                v-if="v$.password.minLength.$invalid"
-                            >
-                                Tối thiểu 6 ký tự
-                            </p>
+                        <div v-if="errorsLogin.password[0]">
+                            <p class="error">{{ errorsLogin.password[0] }}</p>
                         </div>
                     </div>
                 </div>

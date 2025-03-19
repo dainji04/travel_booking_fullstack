@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, email, minLength, sameAs } from '@vuelidate/validators';
 import AuthLayout from '@/layouts/AuthLayout.vue';
-// import useApi from '@/composables/useApi';
+import axios from 'axios';
 
 const isHide = ref(false);
 const formData = ref({
@@ -34,6 +34,17 @@ const submit = async () => {
     if (isValid) {
         console.log('Form hợp lệ!', formData.value);
     }
+
+    axios
+        .post('/register', formData.value)
+        .then((response: any) => {
+            console.log('Đăng ký thành công!', response.data);
+            // Xử lý phản hồi từ máy chủ
+        })
+        .catch((error: any) => {
+            console.error('Đăng ký thất bại!', error.response.data);
+            // Xử lý lỗi
+        });
 };
 </script>
 
