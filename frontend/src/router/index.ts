@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '../views/Home.vue';
 import EmptyLayout from '../layouts/EmptyLayout.vue';
 import DefaultLayout from '../layouts/DefaultLayout.vue';
+import AuthLayout from '@/layouts/AuthLayout.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -9,7 +9,7 @@ const router = createRouter({
         { path: '/', redirect: '/trang-chu' },
         {
             path: '/',
-            component: EmptyLayout,
+            component: AuthLayout,
             children: [
                 {
                     path: 'dang-nhap',
@@ -58,6 +58,22 @@ const router = createRouter({
                     component: () => import('../views/Contact.vue'),
                 },
             ],
+        },
+        {
+            path: '/admin',
+            component: EmptyLayout,
+            children: [
+                {
+                    path: '',
+                    name: 'admin',
+                    component: () => import('../views/admin/Home.vue'),
+                },
+            ],
+        },
+        {
+            path: '/:pathMatch(.*)*',
+            name: 'NotFound',
+            component: () => import('../views/notFound.vue'),
         },
     ],
     scrollBehavior() {

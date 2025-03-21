@@ -5,6 +5,7 @@ interface User {
     email: string;
     password: string;
     name: string;
+    password_confirmation: string;
 }
 
 interface UserLogin {
@@ -14,14 +15,13 @@ interface UserLogin {
 }
 
 interface AuthStore {
-    token: string;
     user: User | null;
     errors: any;
+    role: string;
 }
 
 export const useAuthStore = defineStore('users', {
     state: (): AuthStore => ({
-        token: '',
         user: null,
         errors: {
             email: [] as string[],
@@ -29,6 +29,7 @@ export const useAuthStore = defineStore('users', {
             name: [] as string[],
             phoneNumber: [] as string[],
         },
+        role: '',
     }),
     actions: {
         async getToken() {
@@ -38,10 +39,23 @@ export const useAuthStore = defineStore('users', {
             this.getToken();
             const res = await axios.get('/api/user');
             this.user = res.data;
-            this.token = res.data.token;
+            this.role = res.data.role;
         },
-        signUp(user: User) {
-            // Call the API to sign up the user
+        async register(user: User) {
+            await axios
+                .post('/register', {
+                    email: user.email,
+                    password: user.password,
+                    name: user.name,
+                    password_confirmation: user.password_confirmation,
+                })
+                .then((res) => {
+                    console.log(res);
+                    this.router.push('/');
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
         },
 
         async login(data: UserLogin) {
@@ -50,11 +64,18 @@ export const useAuthStore = defineStore('users', {
                 password: data.password,
                 remember: data.remember,
             });
-            this.router.push('/');
+
+            await this.getUser();
+
+            if (this.role == 'user') {
+                this.router.push('/');
+            } else {
+                this.router.push('/admin');
+            }
         },
 
-        logout() {
-            this.token = '';
+        async logout() {
+            await axios.post('/logout');
             this.user = null;
             this.errors = {
                 email: [],

@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import { onMounted } from 'vue';
 
 const authStore = useAuthStore();
+onMounted(() => {
+    authStore.getUser();
+});
 </script>
 
 <template>
@@ -27,8 +30,6 @@ const authStore = useAuthStore();
             </ul>
             <template v-if="!authStore.user">
                 <div class="options">
-                    <!-- <img class="options__icon" src="@/assets/fonts/search.svg" alt="" />
-                <img class="options__icon" src="@/assets/fonts/list.svg" alt="" /> -->
                     <router-link class="list__text" :to="{ name: 'login' }">
                         Login
                     </router-link>
@@ -36,9 +37,10 @@ const authStore = useAuthStore();
             </template>
             <template v-else>
                 <div class="options">
-                    <router-link class="list__text" to="">
+                    <button @click="authStore.logout">logout</button>
+                    <p href="" class="list__text">
                         Hello, {{ authStore.user.name }}
-                    </router-link>
+                    </p>
                 </div>
             </template>
         </div>
